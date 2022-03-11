@@ -66,7 +66,9 @@
           aria-label="Clear Selected"
           @click="clearSelection"
         >
-          <component :is="childComponents.Deselect" />
+          <slot name="clear-button">
+            <component :is="childComponents.Deselect" />
+          </slot>
         </button>
 
         <slot name="open-indicator" v-bind="scope.openIndicator">
