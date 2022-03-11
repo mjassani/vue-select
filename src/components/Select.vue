@@ -98,9 +98,29 @@
         @mouseup="onMouseUp"
       >
         <slot name="list-header" v-bind="scope.listHeader" />
+        <div v-if="topResults.length > 0">
+          <li
+            v-for="(option, index) in topResults"
+            :id="`vs${uid}__option-${index}`"
+            :key="getOptionKey(option)"
+            role="option"
+            class="vs__dropdown-option"
+            :class="{
+              'vs__dropdown-option--selected': isOptionSelected(option),
+              'vs__dropdown-option--disabled': !selectable(option),
+            }"
+            :aria-selected="index === typeAheadPointer ? true : null"
+            @click.prevent.stop="selectable(option) ? select(option) : null"
+          >
+            <slot name="option" v-bind="normalizeOptionForSlot(option)">
+              {{ getOptionLabel(option) }}
+            </slot>
+          </li>
+          <li>------------------------------</li>
+        </div>
         <li
           v-for="(option, index) in filteredOptions"
-          :id="`vs${uid}__option-${index}`"
+          :id="`vs${uid}__option-${index + topResults ? topResults.length : 0}`"
           :key="getOptionKey(option)"
           role="option"
           class="vs__dropdown-option"
@@ -186,6 +206,13 @@ export default {
      * @type {Array}
      */
     options: {
+      type: Array,
+      default() {
+        return []
+      },
+    },
+
+    topResults: {
       type: Array,
       default() {
         return []
@@ -866,7 +893,13 @@ export default {
      * @return {array}
      */
     filteredOptions() {
-      const optionList = [].concat(this.optionList)
+      let optionList = [].concat(this.optionList)
+
+      if (this.topResults.length > 0) {
+        optionList = optionList.filter(
+          (element) => !this.topResults.includes(element)
+        )
+      }
 
       if (!this.filterable && !this.taggable) {
         return optionList
@@ -1027,6 +1060,7 @@ export default {
      */
     clearSelection() {
       this.updateValue(this.multiple ? [] : null)
+      this.$emit('option:cleared', this.multiple)
     },
 
     /**

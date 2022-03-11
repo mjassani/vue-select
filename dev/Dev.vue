@@ -1,14 +1,18 @@
 <template>
   <div id="app">
-    <v-select v-model="selected" v-bind="config"
-      ><template #clear-button></template
+    <v-select
+      @option:cleared="clearedOption"
+      v-model="selected"
+      v-bind="config"
+    >
+      <template #clear-button></template
     ></v-select>
   </div>
 </template>
 
 <script>
 import vSelect from '../src/components/Select'
-import countries from '../docs/.vuepress/data/countryCodes'
+import countries from '../docs/.vuepress/data/countries'
 import books from '../docs/.vuepress/data/books'
 
 export default {
@@ -17,8 +21,14 @@ export default {
     selected: null,
     config: {
       options: countries,
+      topResults: ['Afghanistan', 'Albania'],
     },
   }),
+  methods: {
+    clearedOption() {
+      alert('option cleared')
+    },
+  },
 }
 </script>
 
