@@ -105,6 +105,8 @@
           role="option"
           class="vs__dropdown-option"
           :class="{
+            'vs__dropdown-option--deselect':
+              isOptionDeselectable(option) && index === typeAheadPointer,
             'vs__dropdown-option--selected': isOptionSelected(option),
             'vs__dropdown-option--disabled': !selectable(option),
           }"
@@ -119,7 +121,7 @@
         <li
           v-for="(option, index) in filteredOptions"
           :id="`vs${uid}__option-${
-            index + (topResults.length > 0 ? topResults.length : 0)
+            index + topResults.length > 0 ? topResults : 0
           }`"
           :key="getOptionKey(option)"
           role="option"
@@ -158,8 +160,8 @@
 </template>
 
 <script>
-import ajax from '../mixins/ajax.js'
 import typeAheadPointer from '../mixins/typeAheadPointer.js'
+import ajax from '../mixins/ajax.js'
 import childComponents from './childComponents.js'
 import appendToBody from '../directives/appendToBody.js'
 import sortAndStringify from '../utility/sortAndStringify.js'

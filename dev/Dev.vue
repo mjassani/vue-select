@@ -5,9 +5,11 @@
       v-model="selected"
       v-bind="config"
       label="name"
+      @option:selected="selectedOption"
     >
       <template #clear-button></template
     ></v-select>
+    {{ selected }}
   </div>
 </template>
 
@@ -20,12 +22,18 @@ export default {
   components: { vSelect },
   data: () => ({
     selected: null,
+
     config: {
       options: countries,
       topResults: [
-        'Brother',
-        'Canon',
-        'DELL',
+        {
+          name: 'Brother',
+          id: '46604eb3d8e10106739d5162ab1b5caf',
+        },
+        {
+          name: 'Canon',
+          id: '56528d326f0339102056231ca03eb2aa',
+        },
         'Epson',
         'HP',
         'Lexmark',
@@ -37,6 +45,9 @@ export default {
   methods: {
     clearedOption() {
       alert('option cleared')
+    },
+    selectedOption(value) {
+      selected = value
     },
   },
 }
