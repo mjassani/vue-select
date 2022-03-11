@@ -125,7 +125,10 @@
           role="option"
           class="vs__dropdown-option"
           :class="{
+            'vs__dropdown-option--deselect':
+              isOptionDeselectable(option) && index === typeAheadPointer,
             'vs__dropdown-option--selected': isOptionSelected(option),
+            'vs__dropdown-option--highlight': index === typeAheadPointer,
             'vs__dropdown-option--disabled': !selectable(option),
           }"
           :aria-selected="index === typeAheadPointer ? true : null"
@@ -156,6 +159,7 @@
 
 <script>
 import ajax from '../mixins/ajax.js'
+import typeAheadPointer from '../mixins/typeAheadPointer.js'
 import childComponents from './childComponents.js'
 import appendToBody from '../directives/appendToBody.js'
 import sortAndStringify from '../utility/sortAndStringify.js'
@@ -169,7 +173,7 @@ export default {
 
   directives: { appendToBody },
 
-  mixins: [ajax],
+  mixins: [typeAheadPointer, ajax],
 
   props: {
     /**
