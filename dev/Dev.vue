@@ -4,6 +4,7 @@
       @option:cleared="clearedOption"
       v-model="selected"
       v-bind="config"
+      label="name"
     >
       <template #clear-button></template
     ></v-select>
@@ -12,7 +13,7 @@
 
 <script>
 import vSelect from '../src/components/Select'
-import countries from '../docs/.vuepress/data/countries'
+import countries from '../docs/.vuepress/data/manufacturers'
 import books from '../docs/.vuepress/data/books'
 
 export default {
@@ -21,7 +22,16 @@ export default {
     selected: null,
     config: {
       options: countries,
-      topResults: ['Afghanistan', 'Albania'],
+      topResults: [
+        'Brother',
+        'Canon',
+        'DELL',
+        'Epson',
+        'HP',
+        'Lexmark',
+        'Samsung',
+        'XEROX',
+      ],
     },
   }),
   methods: {
@@ -47,10 +57,16 @@ body {
 }
 
 hr {
+  background: lightgray;
   border: none;
-  border-bottom: 1px solid #cacaca;
-  margin-bottom: 1em;
-  padding-top: 1em;
-  width: 90%;
+  height: 2px;
+  margin-bottom: 32px;
+  position: relative;
+  top: 16px;
+}
+
+li.vs__dropdown-option:hover {
+  background: var(--vs-dropdown-option--active-bg);
+  color: var(--vs-dropdown-option--active-color);
 }
 </style>

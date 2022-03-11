@@ -98,37 +98,34 @@
         @mouseup="onMouseUp"
       >
         <slot name="list-header" v-bind="scope.listHeader" />
-        <div v-if="topResults.length > 0">
-          <li
-            v-for="(option, index) in topResults"
-            :id="`vs${uid}__option-${index}`"
-            :key="getOptionKey(option)"
-            role="option"
-            class="vs__dropdown-option"
-            :class="{
-              'vs__dropdown-option--selected': isOptionSelected(option),
-              'vs__dropdown-option--disabled': !selectable(option),
-            }"
-            :aria-selected="index === typeAheadPointer ? true : null"
-            @click.prevent.stop="selectable(option) ? select(option) : null"
-          >
-            <slot name="option" v-bind="normalizeOptionForSlot(option)">
-              {{ getOptionLabel(option) }}
-            </slot>
-          </li>
-          <li>------------------------------</li>
-        </div>
         <li
-          v-for="(option, index) in filteredOptions"
-          :id="`vs${uid}__option-${index + topResults ? topResults.length : 0}`"
+          v-for="(option, index) in topResults"
+          :id="`vs${uid}__option-${index}`"
           :key="getOptionKey(option)"
           role="option"
           class="vs__dropdown-option"
           :class="{
-            'vs__dropdown-option--deselect':
-              isOptionDeselectable(option) && index === typeAheadPointer,
             'vs__dropdown-option--selected': isOptionSelected(option),
-            'vs__dropdown-option--highlight': index === typeAheadPointer,
+            'vs__dropdown-option--disabled': !selectable(option),
+          }"
+          :aria-selected="index === typeAheadPointer ? true : null"
+          @click.prevent.stop="selectable(option) ? select(option) : null"
+        >
+          <slot name="option" v-bind="normalizeOptionForSlot(option)">
+            {{ getOptionLabel(option) }}
+          </slot>
+        </li>
+        <li v-if="topResults.length > 0"><hr /></li>
+        <li
+          v-for="(option, index) in filteredOptions"
+          :id="`vs${uid}__option-${
+            index + (topResults.length > 0 ? topResults.length : 0)
+          }`"
+          :key="getOptionKey(option)"
+          role="option"
+          class="vs__dropdown-option"
+          :class="{
+            'vs__dropdown-option--selected': isOptionSelected(option),
             'vs__dropdown-option--disabled': !selectable(option),
           }"
           :aria-selected="index === typeAheadPointer ? true : null"
@@ -158,8 +155,6 @@
 </template>
 
 <script>
-import pointerScroll from '../mixins/pointerScroll.js'
-import typeAheadPointer from '../mixins/typeAheadPointer.js'
 import ajax from '../mixins/ajax.js'
 import childComponents from './childComponents.js'
 import appendToBody from '../directives/appendToBody.js'
@@ -174,7 +169,7 @@ export default {
 
   directives: { appendToBody },
 
-  mixins: [pointerScroll, typeAheadPointer, ajax],
+  mixins: [ajax],
 
   props: {
     /**
@@ -894,12 +889,6 @@ export default {
      */
     filteredOptions() {
       let optionList = [].concat(this.optionList)
-
-      if (this.topResults.length > 0) {
-        optionList = optionList.filter(
-          (element) => !this.topResults.includes(element)
-        )
-      }
 
       if (!this.filterable && !this.taggable) {
         return optionList
