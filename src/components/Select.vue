@@ -17,14 +17,14 @@
     >
       <div ref="selectedOptions" class="vs__selected-options">
         <slot
-          v-for="option in selectedValue"
+          v-for="(option, index) in selectedValue"
           name="selected-option-container"
           :option="normalizeOptionForSlot(option)"
           :deselect="deselect"
           :multiple="multiple"
           :disabled="disabled"
         >
-          <span :key="getOptionKey(option)" class="vs__selected">
+          <span :key="getOptionKey(option, index)" class="vs__selected">
             <slot
               name="selected-option"
               v-bind="normalizeOptionForSlot(option)"
@@ -99,31 +99,9 @@
       >
         <slot name="list-header" v-bind="scope.listHeader" />
         <li
-          v-for="(option, index) in topResults"
-          :id="`vs${uid}__option-${index}`"
-          :key="getOptionKey(option)"
-          role="option"
-          class="vs__dropdown-option"
-          :class="{
-            'vs__dropdown-option--deselect':
-              isOptionDeselectable(option) && index === typeAheadPointer,
-            'vs__dropdown-option--selected': isOptionSelected(option),
-            'vs__dropdown-option--disabled': !selectable(option),
-          }"
-          :aria-selected="index === typeAheadPointer ? true : null"
-          @click.prevent.stop="selectable(option) ? select(option) : null"
-        >
-          <slot name="option" v-bind="normalizeOptionForSlot(option)">
-            {{ getOptionLabel(option) }}
-          </slot>
-        </li>
-        <li v-if="topResults.length > 0"><hr /></li>
-        <li
           v-for="(option, index) in filteredOptions"
-          :id="`vs${uid}__option-${
-            index + topResults.length > 0 ? topResults : 0
-          }`"
-          :key="getOptionKey(option)"
+          :id="`vs${uid}__option-${index}`"
+          :key="getOptionKey(option, index)"
           role="option"
           class="vs__dropdown-option"
           :class="{
@@ -137,7 +115,10 @@
           @mouseover="selectable(option) ? (typeAheadPointer = index) : null"
           @click.prevent.stop="selectable(option) ? select(option) : null"
         >
-          <slot name="option" v-bind="normalizeOptionForSlot(option)">
+          <span v-if="topOptions.length > 0 && index === topOptions.length"
+            >----------------------------</span
+          >
+          <slot v-else name="option" v-bind="normalizeOptionForSlot(option)">
             {{ getOptionLabel(option) }}
           </slot>
         </li>
@@ -160,6 +141,7 @@
 </template>
 
 <script>
+import pointerScroll from '../mixins/pointerScroll.js'
 import typeAheadPointer from '../mixins/typeAheadPointer.js'
 import ajax from '../mixins/ajax.js'
 import childComponents from './childComponents.js'
@@ -175,7 +157,7 @@ export default {
 
   directives: { appendToBody },
 
-  mixins: [typeAheadPointer, ajax],
+  mixins: [pointerScroll, typeAheadPointer, ajax],
 
   props: {
     /**
@@ -213,7 +195,7 @@ export default {
       },
     },
 
-    topResults: {
+    topOptions: {
       type: Array,
       default() {
         return []
@@ -397,14 +379,14 @@ export default {
      */
     getOptionKey: {
       type: Function,
-      default(option) {
+      default(option, index) {
         if (typeof option !== 'object') {
           return option
         }
 
         try {
           return option.hasOwnProperty('id')
-            ? option.id
+            ? option.id + index
             : sortAndStringify(option)
         } catch (e) {
           const warning =
@@ -747,7 +729,12 @@ export default {
      * @return {Array}
      */
     optionList() {
-      return this.options.concat(this.pushTags ? this.pushedTags : [])
+      let optionList = this.options.concat(this.pushTags ? this.pushedTags : [])
+
+      return [
+        ...(this.topOptions.length > 0 ? [...this.topOptions, ...[{}]] : []),
+        ...optionList,
+      ]
     },
 
     /**

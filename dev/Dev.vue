@@ -10,6 +10,7 @@
       <template #clear-button></template
     ></v-select>
     {{ selected }}
+    {{ clearedMessage }}
   </div>
 </template>
 
@@ -22,10 +23,11 @@ export default {
   components: { vSelect },
   data: () => ({
     selected: null,
+    clearedMessage: null,
 
     config: {
       options: countries,
-      topResults: [
+      topOptions: [
         {
           name: 'Brother',
           id: '46604eb3d8e10106739d5162ab1b5caf',
@@ -34,20 +36,16 @@ export default {
           name: 'Canon',
           id: '56528d326f0339102056231ca03eb2aa',
         },
-        'Epson',
-        'HP',
-        'Lexmark',
-        'Samsung',
-        'XEROX',
       ],
     },
   }),
   methods: {
     clearedOption() {
-      alert('option cleared')
+      this.clearedMessage = 'Option cleared'
     },
     selectedOption(value) {
-      selected = value
+      this.selected = value
+      this.clearedMessage = null
     },
   },
 }
@@ -74,10 +72,5 @@ hr {
   margin-bottom: 32px;
   position: relative;
   top: 16px;
-}
-
-li.vs__dropdown-option:hover {
-  background: var(--vs-dropdown-option--active-bg);
-  color: var(--vs-dropdown-option--active-color);
 }
 </style>
